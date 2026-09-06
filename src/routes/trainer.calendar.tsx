@@ -17,8 +17,6 @@ import {
   useCoachClients,
   useCoachEventTypes,
   type BookingRow,
-  type ProfileRow,
-  type EventTypeRow,
 } from "@/lib/queries";
 import { queryKeys } from "@/lib/query-keys";
 import { gcalReconcileEvents, gcalRepairMissingEvents } from "@/lib/gcal.functions";
@@ -124,7 +122,6 @@ function CalendarPage() {
       // Repair (DB -> Google) gira a passate da 50 finché non resta nulla.
       let totalCreated = 0;
       let safety = 20;
-      // eslint-disable-next-line no-constant-condition
       while (safety-- > 0) {
         const r = await gcalRepairMissingEvents();
         if (!r.ok) break;

@@ -147,7 +147,7 @@ function BookFlow() {
   // Lette qui per allineare gli slot mostrati al cliente con il trigger
   // server-side `enforce_client_booking_rules`. Default 24h / 60gg se manca
   // la riga trainer_settings.
-  const trainerSettingsQ = useQuery({
+  const _trainerSettingsQ = useQuery({
     queryKey: ["coach-booking-rules", coachIdForAvail],
     enabled: !!coachIdForAvail,
     queryFn: async () => {
@@ -264,16 +264,6 @@ function BookFlow() {
     minNoticeHours,
     horizonDays,
   ]);
-
-  const grouped = useMemo(() => {
-    const m = new Map<string, Slot[]>();
-    for (const s of slots) {
-      const k = s.date.toDateString();
-      if (!m.has(k)) m.set(k, []);
-      m.get(k)!.push(s);
-    }
-    return m;
-  }, [slots]);
 
   // Pools list (one entry per credit pool: block allocation OR extra credit pack).
   interface Pool {

@@ -80,11 +80,8 @@ export function useBookConfirm(input: UseBookConfirmInput): UseBookConfirmReturn
   const {
     meId,
     meName,
-    meEmail,
     mePhone,
     coachId,
-    coachName,
-    emailNotificationsEnabled,
     selectedISO,
     selectedPoolKey,
     pools,

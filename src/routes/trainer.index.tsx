@@ -10,7 +10,7 @@ import {
   useCoachEventTypes,
 } from "@/lib/queries";
 import { queryKeys } from "@/lib/query-keys";
-import { sessionLabel, type SessionType } from "@/lib/mock-data";
+import { sessionLabel } from "@/lib/mock-data";
 import { initials } from "@/lib/initials";
 import { startOfToday, endOfToday, startOfYear } from "@/lib/date-windows";
 import { iconForType } from "@/lib/session-type-icon";
