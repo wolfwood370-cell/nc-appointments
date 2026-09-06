@@ -232,6 +232,7 @@ export function AssignPackageDialog({
         totalBlocks: pathType === "free" ? 0 : totalBlocks,
         packLabel: pathType === "free" ? (packLabel ?? "Cliente Libero") : packLabel,
         autoRenew: pathType === "recurring",
+        startDate,
         rules: expandedRules,
         freeSessions: pathType === "free" ? freeSessions : undefined,
         freeEventTypeId: pathType === "free" ? freeEventTypeId : undefined,
