@@ -248,20 +248,17 @@ export function AssignPackageDialog({
         <DialogTitle>Assegna pacchetto — {clientName}</DialogTitle>
       </DialogHeader>
 
-      {hasExistingPackage ? (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 flex gap-3">
-          <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
-            <p className="font-semibold">Questo cliente ha già un percorso a blocchi attivo.</p>
-            <p className="mt-1">
-              Per evitare di sovrascrivere o duplicare dati, l'assegnazione di un nuovo percorso è
-              disponibile solo per clienti senza blocchi attivi. La funzione "cambia pacchetto" (con
-              azzeramento del precedente) verrà aggiunta più avanti.
-            </p>
-          </div>
-        </div>
-      ) : (
+      {(
         <div className="space-y-4">
+          {hasExistingPackage && (
+            <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 flex gap-3 text-xs text-amber-900">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                Questo cliente ha già dei blocchi: i nuovi blocchi vengono <strong>accodati</strong>{" "}
+                a partire dalla data d'inizio indicata, senza cancellare quelli esistenti.
+              </span>
+            </div>
+          )}
           {hasCredits && (
             <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
               Questo cliente ha già dei crediti extra: la nuova assegnazione li{" "}
