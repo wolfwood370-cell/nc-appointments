@@ -942,7 +942,10 @@ function ClientPathPage() {
         // già dei blocchi, l'ancora esistente NON va toccata (repair ricalcola
         // le date da lì); si imposta solo quando manca.
         const lastNewEnd = blocksToInsert[blocksToInsert.length - 1]?.end_date ?? null;
-        const pathStartIso = client?.path_start_date ?? blocksToInsert[0]?.start_date ?? null;
+        const pathStartIso =
+          (profile?.path_start_date as string | null | undefined) ??
+          blocksToInsert[0]?.start_date ??
+          null;
         const { error: pErr } = await supabase
           .from("profiles")
           .update({
