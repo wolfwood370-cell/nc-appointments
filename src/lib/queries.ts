@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SessionType, BookingStatus } from "@/lib/mock-data";
-import { invalidateBookingScope, queryKeys } from "@/lib/query-keys";
+import { invalidateBookingScope } from "@/lib/query-keys";
 import { gcalDeleteEvent, gcalUpdateEvent } from "@/lib/gcal.functions";
 
 export interface BookingRow {

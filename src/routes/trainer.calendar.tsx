@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,6 @@ import { CalendarContextPanel } from "@/components/calendar-context-panel";
 import { CalendarGcalReview } from "@/components/calendar-gcal-review";
 import { CalendarEventEditDialog } from "@/components/calendar-event-edit-dialog";
 import { layoutDay } from "@/lib/calendar-layout";
-import { MessageCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCoachBookings,
@@ -26,7 +24,6 @@ import { queryKeys } from "@/lib/query-keys";
 import { gcalReconcileEvents, gcalRepairMissingEvents } from "@/lib/gcal.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { isAllDayEvent, sameDay, MobileAgendaView } from "@/components/mobile-calendar-agenda";
 
 export const Route = createFileRoute("/trainer/calendar")({

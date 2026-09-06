@@ -1,10 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 
 import {
   Table,
@@ -14,22 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Plus,
   Search,
-  Loader2,
-  Mail,
-  X,
   UserPlus,
-  Copy,
   Check,
   Calendar,
   // MessageCircle removed: phone shortcut moved to detail page
@@ -53,7 +39,6 @@ import { queryKeys } from "@/lib/query-keys";
 import { parseEdgeError } from "@/lib/edge-function-error";
 import { errorMessage } from "@/lib/utils";
 import { sessionLabel, type SessionType } from "@/lib/mock-data";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AuraCardSkeleton,
