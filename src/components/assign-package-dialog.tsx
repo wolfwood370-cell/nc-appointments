@@ -91,14 +91,16 @@ export function AssignPackageDialog({
   eventTypes,
   hasExistingPackage,
   hasCredits = false,
+  defaultStartDate,
   onAssign,
 }: {
   open: boolean;
   clientName: string;
   eventTypes: AssignPackageEventType[];
-  /** true se il cliente ha già blocchi attivi o crediti extra: in v1 blocchiamo
-   *  la riassegnazione per non sovrascrivere/duplicare dati. */
+  /** true se il cliente ha già blocchi: i nuovi blocchi vengono accodati. */
   hasExistingPackage: boolean;
+  /** Data suggerita per il primo nuovo blocco (YYYY-MM-DD). */
+  defaultStartDate?: string;
   /** true se esistono già crediti extra: non blocca, mostra solo un avviso. */
   hasCredits?: boolean;
   onAssign: (d: AssignPackagePayload) => Promise<void>;
