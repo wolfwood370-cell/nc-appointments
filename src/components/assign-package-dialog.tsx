@@ -111,6 +111,8 @@ export function AssignPackageDialog({
   const [freeSessions, setFreeSessions] = useState<number>(1);
   const [freeEventTypeId, setFreeEventTypeId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const [startDate, setStartDate] = useState<string>(defaultStartDate ?? todayIso);
 
   // Reset lo stato quando il dialog si chiude (il subtree resta montato).
   const wasOpenRef = useRef(false);
