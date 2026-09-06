@@ -938,12 +938,11 @@ function ClientPathPage() {
           if (aErr) throw aErr;
         }
 
-        // path_start_date = oggi (= start del blocco 1). Senza, repair/ensure
-        // ritornano no_anchor e il cron auto-renew salta il cliente.
-        const today2 = new Date();
-        const nextBilling = new Date(today2);
-        nextBilling.setDate(today2.getDate() + 30);
-        const pathStartIso = today2.toISOString().slice(0, 10);
+        // path_start_date = start del blocco 1 della catena. Se il cliente ha
+        // già dei blocchi, l'ancora esistente NON va toccata (repair ricalcola
+        // le date da lì); si imposta solo quando manca.
+        const lastNewEnd = blocksToInsert[blocksToInsert.length - 1]?.end_date ?? null;
+        const pathStartIso = client?.path_start_date ?? blocksToInsert[0]?.start_date ?? null;
         const { error: pErr } = await supabase
           .from("profiles")
           .update({
@@ -952,8 +951,7 @@ function ClientPathPage() {
             auto_renew_blocks: data.autoRenew,
             pack_label: data.packLabel,
             path_start_date: pathStartIso,
-            next_billing_date:
-              data.pathType === "recurring" ? nextBilling.toISOString().slice(0, 10) : null,
+            next_billing_date: data.pathType === "recurring" ? lastNewEnd : null,
           })
           .eq("id", clientId);
         if (pErr) throw pErr;
