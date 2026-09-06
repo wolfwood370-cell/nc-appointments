@@ -411,16 +411,26 @@ export function AssignPackageDialog({
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                {totalBlocks} blocchi sequenziali (~30 giorni ciascuno). La data d'inizio sarà oggi
-                (modificabile poi dalla scheda).
+                {totalBlocks} blocchi sequenziali da 4 settimane (28 giorni) ciascuno.
               </p>
             </div>
           )}
 
           {pathType === "recurring" && (
             <p className="text-xs text-muted-foreground">
-              1 blocco mensile con rinnovo automatico ogni 30 giorni. Data d'inizio: oggi.
+              1 blocco da 4 settimane con rinnovo automatico.
             </p>
+          )}
+
+          {pathType !== "free" && (
+            <div className="space-y-2">
+              <Label>Data di inizio primo blocco</Label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
           )}
 
           {/* Regole crediti per Percorso/Abbonamento */}
