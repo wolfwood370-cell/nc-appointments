@@ -15,12 +15,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { useCoachEventTypes } from "@/lib/queries";
 import type { SessionType } from "@/lib/mock-data";
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

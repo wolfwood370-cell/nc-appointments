@@ -41,11 +41,7 @@ import {
 } from "@/components/ui/select";
 import type { SessionType } from "@/lib/mock-data";
 
-export type EditableBookingStatus =
-  | "scheduled"
-  | "completed"
-  | "cancelled"
-  | "late_cancelled";
+export type EditableBookingStatus = "scheduled" | "completed" | "cancelled" | "late_cancelled";
 
 // Local copy of the parent's ClientBooking — just the fields the dialog
 // reads. Kept loose so a parent shape change doesn't force a dialog
@@ -228,8 +224,8 @@ export function EditBookingDialog({
             <AlertDialogHeader>
               <AlertDialogTitle>Eliminare la sessione ovunque?</AlertDialogTitle>
               <AlertDialogDescription>
-                L'evento verrà eliminato definitivamente, anche da Google Calendar.
-                L'azione non può essere annullata.
+                L'evento verrà eliminato definitivamente, anche da Google Calendar. L'azione non può
+                essere annullata.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

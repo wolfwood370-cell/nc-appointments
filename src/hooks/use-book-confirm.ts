@@ -285,11 +285,10 @@ export function useBookConfirm(input: UseBookConfirmInput): UseBookConfirmReturn
       });
 
       const usedExtra = !!extraId;
-      const meetNote = " I link videochiamata sono generati automaticamente per le sessioni online.";
+      const meetNote =
+        " I link videochiamata sono generati automaticamente per le sessioni online.";
       toast.success("Sessione prenotata", {
-        description: usedExtra
-          ? `Scalata da credito omaggio/extra.`
-          : meetNote.trim(),
+        description: usedExtra ? `Scalata da credito omaggio/extra.` : meetNote.trim(),
 
         action: calendarUrl
           ? {
