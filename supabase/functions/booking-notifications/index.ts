@@ -35,7 +35,6 @@ interface Payload {
   booking_id?: string | null;
 }
 
-
 /**
  * Validate a phone number in loose E.164 format prior to handing it to
  * the WhatsApp Graph API. Without this guard, malformed inputs (empty
@@ -301,7 +300,6 @@ Deno.serve(async (req) => {
       results.push = { skipped: "no_vapid" };
     }
 
-
     // ---- 3. WhatsApp (opt-in, to client, only on first creation) -------
     // We deliberately don't WhatsApp the client on reschedule: the
     // client just performed the reschedule themselves, so a
@@ -320,11 +318,17 @@ Deno.serve(async (req) => {
     // (XSS/payload abuse via link arbitrario salvato in JSONB e inviato a
     // terzi). Accetta solo https:// con lunghezza ragionevole.
     let safeMeetingLink: string | null = null;
-    if (body.meeting_link && typeof body.meeting_link === "string" && body.meeting_link.length <= 2048) {
+    if (
+      body.meeting_link &&
+      typeof body.meeting_link === "string" &&
+      body.meeting_link.length <= 2048
+    ) {
       try {
         const parsed = new URL(body.meeting_link);
         if (parsed.protocol === "https:") safeMeetingLink = parsed.toString();
-      } catch { /* invalid URL → skip */ }
+      } catch {
+        /* invalid URL → skip */
+      }
     }
     // Wave 7 P6: wa_access_token va in un header Authorization; rimuovi
     // CR/LF per prevenire header injection se il token fosse corrotto.
@@ -376,8 +380,6 @@ Deno.serve(async (req) => {
     } else {
       results.whatsapp = { skipped: true };
     }
-
-
 
     return jsonResponse({ ok: true, results }, 200, req);
   } catch (e) {

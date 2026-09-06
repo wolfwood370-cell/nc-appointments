@@ -113,7 +113,9 @@ Deno.serve(async (req) => {
       status: "pending",
     });
     if (invErr && (invErr as { code?: string }).code !== "23505") {
-      console.error("admin-create-user: invitation insert failed", { code: (invErr as { code?: string }).code });
+      console.error("admin-create-user: invitation insert failed", {
+        code: (invErr as { code?: string }).code,
+      });
       return jsonResponse({ error: "Impossibile creare l'invito." }, 400, req);
     }
 
