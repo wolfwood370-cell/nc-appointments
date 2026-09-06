@@ -920,7 +920,7 @@ function ClientPathPage() {
         }> = [];
         for (const rule of data.rules) {
           for (let m = rule.startBlock; m <= rule.endBlock; m++) {
-            const b = blockBySeq.get(m);
+            const b = blockBySeq.get(seqOffset + m);
             if (!b) continue;
             allocsToInsert.push({
               block_id: b.id,
