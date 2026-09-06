@@ -130,12 +130,15 @@ export function AssignPackageDialog({
       setSubmitting(false);
     }
     // Quando si apre: default freeEventTypeId al primo PT disponibile.
-    if (!wasOpenRef.current && open && !freeEventTypeId) {
-      const pt = eventTypes.find((e) => e.base_type === "PT Session") ?? eventTypes[0];
-      if (pt) setFreeEventTypeId(pt.id);
+    if (!wasOpenRef.current && open) {
+      setStartDate(defaultStartDate ?? new Date().toISOString().slice(0, 10));
+      if (!freeEventTypeId) {
+        const pt = eventTypes.find((e) => e.base_type === "PT Session") ?? eventTypes[0];
+        if (pt) setFreeEventTypeId(pt.id);
+      }
     }
     wasOpenRef.current = open;
-  }, [open, eventTypes, freeEventTypeId]);
+  }, [open, eventTypes, freeEventTypeId, defaultStartDate]);
 
   const totalBlocks =
     pathType === "recurring"
