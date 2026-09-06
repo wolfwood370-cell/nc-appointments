@@ -58,6 +58,8 @@ export interface AssignPackagePayload {
   totalBlocks: number;
   packLabel: string | null;
   autoRenew: boolean;
+  /** Data di inizio del primo nuovo blocco (YYYY-MM-DD). */
+  startDate: string;
   rules: Array<{
     eventTypeId: string;
     sessionType: SessionType;
