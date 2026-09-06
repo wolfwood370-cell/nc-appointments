@@ -866,20 +866,34 @@ function ClientPathPage() {
           .eq("id", clientId);
         if (pErr) throw pErr;
       } else {
-        // Percorso Fisso / Abbonamento: blocchi + allocations a partire da oggi.
-        const today = new Date();
+        // Percorso Fisso / Abbonamento: blocchi da 4 settimane, ACCODATI a quelli
+        // esistenti (la catena deve restare contigua: repair_blocks_alignment
+        // ricalcola le date a partire da path_start_date).
+        const { data: existing, error: exErr } = await supabase
+          .from("training_blocks")
+          .select("sequence_order, end_date")
+          .eq("client_id", clientId)
+          .is("deleted_at", null)
+          .order("sequence_order", { ascending: false })
+          .limit(1);
+        if (exErr) throw exErr;
+        const last = existing?.[0];
+        const seqOffset = last ? (last.sequence_order as number) : 0;
+        const firstStart = last
+          ? new Date(new Date(`${last.end_date}T00:00:00Z`).getTime() + 86400000)
+          : new Date(`${data.startDate}T00:00:00Z`);
+        const DAY = 86400000;
         const blocksToInsert = Array.from({ length: data.totalBlocks }, (_, i) => {
-          const start = new Date(today);
-          start.setDate(today.getDate() + i * 30);
-          const end = new Date(today);
-          end.setDate(today.getDate() + (i + 1) * 30 - 1);
+          const start = new Date(firstStart.getTime() + i * 28 * DAY);
+          const end = new Date(start.getTime() + 27 * DAY);
           return {
             client_id: clientId,
             coach_id: user.id,
             start_date: start.toISOString().slice(0, 10),
             end_date: end.toISOString().slice(0, 10),
             status: "active" as const,
-            sequence_order: i + 1,
+            sequence_order: seqOffset + i + 1,
+            duration_days: 28,
           };
         });
         const { data: blocksRes, error: bErr } = await supabase
