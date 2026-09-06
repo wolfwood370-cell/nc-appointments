@@ -29,6 +29,16 @@ import { useClientBlocks, useClientBookings, useCoachEventTypes } from "@/lib/qu
 import { sessionLabel } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/client/settings")({
+  head: () => ({
+    meta: [
+      { title: "Impostazioni | NC Training Systems" },
+      { name: "description", content: "Gestisci i tuoi dati personali, le notifiche e le preferenze dell"account." },
+      { property: "og:title", content: "Impostazioni | NC Training Systems" },
+      { property: "og:description", content: "Gestisci i tuoi dati personali, le notifiche e le preferenze dell"account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientSettings,
 });
 

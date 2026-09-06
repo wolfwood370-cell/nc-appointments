@@ -35,6 +35,16 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/trainer/")({
+  head: () => ({
+    meta: [
+      { title: "Panoramica coach | NC Training Systems" },
+      { name: "description", content: "Appuntamenti di oggi, clienti attivi e attività recenti in un"unica schermata." },
+      { property: "og:title", content: "Panoramica coach | NC Training Systems" },
+      { property: "og:description", content: "Appuntamenti di oggi, clienti attivi e attività recenti in un"unica schermata." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Overview,
 });
 

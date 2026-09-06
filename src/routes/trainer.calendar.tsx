@@ -25,6 +25,24 @@ import { toast } from "sonner";
 import { isAllDayEvent, sameDay, MobileAgendaView } from "@/components/mobile-calendar-agenda";
 
 export const Route = createFileRoute("/trainer/calendar")({
+  head: () => ({
+    meta: [
+      { title: "Calendario | NC Training Systems" },
+      {
+        name: "description",
+        content:
+          "Tutti gli appuntamenti, i blocchi personali e la sincronizzazione con Google Calendar.",
+      },
+      { property: "og:title", content: "Calendario | NC Training Systems" },
+      {
+        property: "og:description",
+        content:
+          "Tutti gli appuntamenti, i blocchi personali e la sincronizzazione con Google Calendar.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: CalendarPage,
 });
 

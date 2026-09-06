@@ -55,6 +55,22 @@ function creditColor(name: string): string {
 }
 
 export const Route = createFileRoute("/trainer/clients/$id")({
+  head: () => ({
+    meta: [
+      { title: "Scheda cliente | NC Training Systems" },
+      {
+        name: "description",
+        content: "Anagrafica, percorsi attivi, crediti e storico appuntamenti del cliente.",
+      },
+      { property: "og:title", content: "Scheda cliente | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Anagrafica, percorsi attivi, crediti e storico appuntamenti del cliente.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientPathPage,
 });
 

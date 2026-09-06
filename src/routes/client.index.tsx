@@ -41,6 +41,16 @@ import { ClientReminderBanner } from "@/components/client-reminder-banner";
 import { ClientFeedbackCard } from "@/components/client-feedback-card";
 
 export const Route = createFileRoute("/client/")({
+  head: () => ({
+    meta: [
+      { title: "Area personale | NC Training Systems" },
+      { name: "description", content: "Le tue sessioni, i crediti disponibili e i prossimi appuntamenti in un colpo d"occhio." },
+      { property: "og:title", content: "Area personale | NC Training Systems" },
+      { property: "og:description", content: "Le tue sessioni, i crediti disponibili e i prossimi appuntamenti in un colpo d"occhio." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientHome,
 });
 

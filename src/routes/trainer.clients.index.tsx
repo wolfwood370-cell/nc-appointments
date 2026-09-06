@@ -55,6 +55,22 @@ import { PendingInvitationsCard } from "@/components/pending-invitations-card";
 import { initials } from "@/lib/initials";
 
 export const Route = createFileRoute("/trainer/clients/")({
+  head: () => ({
+    meta: [
+      { title: "Clienti | NC Training Systems" },
+      {
+        name: "description",
+        content: "Elenco dei clienti con stato dei percorsi e crediti residui.",
+      },
+      { property: "og:title", content: "Clienti | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Elenco dei clienti con stato dei percorsi e crediti residui.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientsPage,
 });
 

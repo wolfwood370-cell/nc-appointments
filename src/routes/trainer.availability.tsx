@@ -21,6 +21,22 @@ import { HOURS, fmt } from "@/lib/availability-helpers";
 import { AvailabilityExceptionsCard } from "@/components/availability-exceptions-card";
 
 export const Route = createFileRoute("/trainer/availability")({
+  head: () => ({
+    meta: [
+      { title: "Disponibilità | NC Training Systems" },
+      {
+        name: "description",
+        content: "Imposta orari di lavoro, eccezioni e regole di prenotazione.",
+      },
+      { property: "og:title", content: "Disponibilità | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Imposta orari di lavoro, eccezioni e regole di prenotazione.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: AvailabilityPage,
 });
 

@@ -3,6 +3,24 @@ import { useAuth, pathForRole } from "@/lib/auth";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "NC Training Systems | Allenamento personalizzato" },
+      {
+        name: "description",
+        content:
+          "Piattaforma NC Training Systems: prenota sessioni PT, percorsi mensili e BIA con il tuo coach.",
+      },
+      { property: "og:title", content: "NC Training Systems | Allenamento personalizzato" },
+      {
+        property: "og:description",
+        content:
+          "Piattaforma NC Training Systems: prenota sessioni PT, percorsi mensili e BIA con il tuo coach.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 

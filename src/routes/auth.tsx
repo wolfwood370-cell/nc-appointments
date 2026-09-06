@@ -10,6 +10,24 @@ import { GoogleIcon } from "@/components/google-icon";
 import { traduciErrore } from "@/lib/auth-error-messages";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Accedi | NC Training Systems" },
+      {
+        name: "description",
+        content:
+          "Accedi al tuo profilo NC Training Systems per gestire sessioni, percorsi e prenotazioni.",
+      },
+      { property: "og:title", content: "Accedi | NC Training Systems" },
+      {
+        property: "og:description",
+        content:
+          "Accedi al tuo profilo NC Training Systems per gestire sessioni, percorsi e prenotazioni.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: AuthPage,
 });
 

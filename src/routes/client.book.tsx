@@ -40,6 +40,22 @@ import { useBookConfirm } from "@/hooks/use-book-confirm";
 // evitare che valori arbitrari entrino in query/lookup downstream.
 const BOOK_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const Route = createFileRoute("/client/book")({
+  head: () => ({
+    meta: [
+      { title: "Prenota una sessione | NC Training Systems" },
+      {
+        name: "description",
+        content: "Scegli data, orario e tipologia per prenotare la tua prossima sessione.",
+      },
+      { property: "og:title", content: "Prenota una sessione | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Scegli data, orario e tipologia per prenotare la tua prossima sessione.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: BookFlow,
   validateSearch: (search: Record<string, unknown>): { eventType?: string } => {
     const v = search.eventType;

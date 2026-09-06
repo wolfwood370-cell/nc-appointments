@@ -27,6 +27,22 @@ import { GCAL_COLORS, GCAL_DEFAULT, nameForColor } from "@/lib/event-colors";
 import { EventTypeServiceCard } from "@/components/event-type-service-card";
 
 export const Route = createFileRoute("/trainer/event-types")({
+  head: () => ({
+    meta: [
+      { title: "Tipologie evento | NC Training Systems" },
+      {
+        name: "description",
+        content: "Configura durata, colore e regole di prenotazione di ogni tipologia di sessione.",
+      },
+      { property: "og:title", content: "Tipologie evento | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Configura durata, colore e regole di prenotazione di ogni tipologia di sessione.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: EventTypesPage,
 });
 

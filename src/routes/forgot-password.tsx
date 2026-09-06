@@ -9,6 +9,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/forgot-password")({
+  head: () => ({
+    meta: [
+      { title: "Recupera password | NC Training Systems" },
+      {
+        name: "description",
+        content:
+          "Richiedi il link per reimpostare la password del tuo profilo NC Training Systems.",
+      },
+      { property: "og:title", content: "Recupera password | NC Training Systems" },
+      {
+        property: "og:description",
+        content:
+          "Richiedi il link per reimpostare la password del tuo profilo NC Training Systems.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ForgotPassword,
 });
 

@@ -33,6 +33,22 @@ import { AdminStatCard } from "@/components/admin-stat-card";
 import { AdminRoleEditor } from "@/components/admin-role-editor";
 
 export const Route = createFileRoute("/admin")({
+  head: () => ({
+    meta: [
+      { title: "Amministrazione | NC Training Systems" },
+      {
+        name: "description",
+        content: "Pannello di amministrazione: utenti, ruoli e impostazioni della piattaforma.",
+      },
+      { property: "og:title", content: "Amministrazione | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Pannello di amministrazione: utenti, ruoli e impostazioni della piattaforma.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   // M2 (FULL_APP_AUDIT.md): server-side route guard. The previous
   // role check happened in the React tree after useAuth resolved,
   // letting non-admins briefly mount the admin page (queries fire,
