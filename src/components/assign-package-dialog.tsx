@@ -539,16 +539,10 @@ export function AssignPackageDialog({
       )}
 
       <DialogFooter>
-        {!hasExistingPackage && (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting || eventTypes.length === 0}
-          >
-            {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
-            Assegna pacchetto
-          </Button>
-        )}
+        <Button type="button" onClick={handleSubmit} disabled={submitting || eventTypes.length === 0}>
+          {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
+          Assegna pacchetto
+        </Button>
       </DialogFooter>
     </DialogContent>
   );
