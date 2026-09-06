@@ -11,8 +11,6 @@ import {
   useCoachAvailabilityExceptions,
   useCoachEventTypes,
   useCoachOptimizationEnabled,
-  type AvailabilityRow,
-  type AvailabilityExceptionRow,
   type EventTypeRow,
 } from "@/lib/queries";
 // generateMockMeetLink was deprecated: the real Google Meet URL is now
@@ -25,7 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format, startOfMonth, addDays, startOfDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { EmptyStateCard } from "@/components/empty-state-card";
-import { generateSlots, type Slot, type BlockedRange } from "@/lib/booking-slots";
+import { generateSlots, type BlockedRange } from "@/lib/booking-slots";
 import { BookCalendarGrid } from "@/components/book-calendar-grid";
 import { BookSlotsGrid } from "@/components/book-slots-grid";
 import { BookPoolPicker } from "@/components/book-pool-picker";
