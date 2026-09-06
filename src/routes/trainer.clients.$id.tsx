@@ -11,25 +11,8 @@ import { AutoRenewToggleCard } from "@/components/auto-renew-toggle-card";
 import { TimelineWeekRow } from "@/components/timeline-week-row";
 import { AssignPackageDialog, type AssignPackagePayload } from "@/components/assign-package-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog } from "@/components/ui/dialog";
 import {
   ArrowLeft,
   Loader2,
@@ -37,9 +20,6 @@ import {
   Save,
   RotateCcw,
   Plus,
-  Trash2,
-  Unlink,
-  Edit3,
   CheckCircle2,
   Clock,
   ChevronDown,
@@ -75,6 +55,22 @@ function creditColor(name: string): string {
 }
 
 export const Route = createFileRoute("/trainer/clients/$id")({
+  head: () => ({
+    meta: [
+      { title: "Scheda cliente | NC Training Systems" },
+      {
+        name: "description",
+        content: "Anagrafica, percorsi attivi, crediti e storico appuntamenti del cliente.",
+      },
+      { property: "og:title", content: "Scheda cliente | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Anagrafica, percorsi attivi, crediti e storico appuntamenti del cliente.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientPathPage,
 });
 
@@ -156,9 +152,7 @@ function ClientPathPage() {
   const [pathStart, setPathStart] = useState<Date | undefined>(undefined);
   const [blocks, setBlocks] = useState<BlockRecord[]>([]);
   const [allocations, setAllocations] = useState<AllocationRecord[]>([]);
-  const [completedByBlockType, setCompletedByBlockType] = useState<
-    Record<string, Record<string, number>>
-  >({});
+  const [, setCompletedByBlockType] = useState<Record<string, Record<string, number>>>({});
   const [rows, setRows] = useState<WeekRow[]>([]);
   const [originalRows, setOriginalRows] = useState<WeekRow[]>([]);
   const [orphans, setOrphans] = useState<OrphanBooking[]>([]);
@@ -942,9 +936,7 @@ function ClientPathPage() {
         // già dei blocchi, l'ancora esistente NON va toccata (repair ricalcola
         // le date da lì); si imposta solo quando manca.
         const lastNewEnd = blocksToInsert[blocksToInsert.length - 1]?.end_date ?? null;
-        const pathStartIso = pathStart
-          ? toIso(pathStart)
-          : (blocksToInsert[0]?.start_date ?? null);
+        const pathStartIso = pathStart ? toIso(pathStart) : (blocksToInsert[0]?.start_date ?? null);
         const { error: pErr } = await supabase
           .from("profiles")
           .update({

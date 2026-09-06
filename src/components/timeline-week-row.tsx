@@ -53,8 +53,7 @@ export function TimelineWeekRow<TBooking extends TimelineBookingItem = TimelineB
   const date = row.monday_date ? parseISO(row.monday_date) : null;
   const weekEnd = date ? addDays(date, 7) : null;
   const isPast = weekEnd ? isBefore(weekEnd, today) : false;
-  const isCurrent =
-    date && weekEnd ? !isBefore(today, date) && isBefore(today, weekEnd) : false;
+  const isCurrent = date && weekEnd ? !isBefore(today, date) && isBefore(today, weekEnd) : false;
 
   return (
     <div className={cn("space-y-3", isPast && "opacity-70")}>
@@ -93,9 +92,7 @@ export function TimelineWeekRow<TBooking extends TimelineBookingItem = TimelineB
       {/* Bookings */}
       {weekBookings.length === 0 ? (
         <div className="border border-dashed border-border rounded-2xl p-4 flex items-center justify-center text-center bg-background/50 h-24">
-          <span className="text-sm text-muted-foreground italic">
-            Nessuna sessione prevista
-          </span>
+          <span className="text-sm text-muted-foreground italic">Nessuna sessione prevista</span>
         </div>
       ) : (
         <div className="flex flex-col gap-2">

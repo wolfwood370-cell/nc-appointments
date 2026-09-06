@@ -9,6 +9,16 @@ import {
 } from "@/components/client-booking-detail-view";
 
 export const Route = createFileRoute("/client/bookings/$bookingId")({
+  head: () => ({
+    meta: [
+      { title: "Dettaglio appuntamento | NC Training Systems" },
+      { name: "description", content: "Consulta, sposta o annulla il tuo appuntamento." },
+      { property: "og:title", content: "Dettaglio appuntamento | NC Training Systems" },
+      { property: "og:description", content: "Consulta, sposta o annulla il tuo appuntamento." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: BookingDetailPage,
 });
 

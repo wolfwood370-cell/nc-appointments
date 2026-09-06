@@ -22,13 +22,9 @@ export interface BookPoolPickerProps {
 export function BookPoolPicker({ pools, selectedPoolKey, onSelectPoolKey }: BookPoolPickerProps) {
   return (
     <section>
-      <h2 className="font-semibold text-lg text-on-surface mb-stack-sm">
-        Seleziona la tipologia
-      </h2>
+      <h2 className="font-semibold text-lg text-on-surface mb-stack-sm">Seleziona la tipologia</h2>
       {pools.length === 0 ? (
-        <p className="text-sm text-on-surface-variant">
-          Nessun credito residuo nel blocco attivo.
-        </p>
+        <p className="text-sm text-on-surface-variant">Nessun credito residuo nel blocco attivo.</p>
       ) : (
         <div
           role="radiogroup"

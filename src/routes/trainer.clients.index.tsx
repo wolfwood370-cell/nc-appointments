@@ -1,10 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 
 import {
   Table,
@@ -14,26 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Plus,
   Search,
-  Loader2,
-  Mail,
-  X,
   UserPlus,
-  Copy,
   Check,
   Calendar,
   // MessageCircle removed: phone shortcut moved to detail page
-  Sparkles,
   LayoutGrid,
   List,
 } from "lucide-react";
@@ -53,7 +38,6 @@ import { queryKeys } from "@/lib/query-keys";
 import { parseEdgeError } from "@/lib/edge-function-error";
 import { errorMessage } from "@/lib/utils";
 import { sessionLabel, type SessionType } from "@/lib/mock-data";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AuraCardSkeleton,
@@ -71,6 +55,22 @@ import { PendingInvitationsCard } from "@/components/pending-invitations-card";
 import { initials } from "@/lib/initials";
 
 export const Route = createFileRoute("/trainer/clients/")({
+  head: () => ({
+    meta: [
+      { title: "Clienti | NC Training Systems" },
+      {
+        name: "description",
+        content: "Elenco dei clienti con stato dei percorsi e crediti residui.",
+      },
+      { property: "og:title", content: "Clienti | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Elenco dei clienti con stato dei percorsi e crediti residui.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ClientsPage,
 });
 
@@ -224,7 +224,7 @@ function ClientsPage() {
   const [bookings, setBookings] = useState<BookingLite[]>([]);
   // Predictive analytics: rows from the `client_exhaustion_forecast` view.
   // Keyed by client_id for O(1) lookup when rendering the card grid.
-  const [forecasts, setForecasts] = useState<
+  const [, setForecasts] = useState<
     Map<string, { daysLeft: number | null; date: string | null; weeklyAvg: number }>
   >(new Map());
   const [loading, setLoading] = useState(true);

@@ -11,7 +11,6 @@ interface Payload {
   url?: string;
 }
 
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405, req);
@@ -102,7 +101,6 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "VAPID keys not configured" }, 500, req);
     }
 
-
     // Authorization: caller may push to self, OR coach/admin may push to their managed clients.
     if (profile_id !== auth.userId) {
       if (auth.role !== "coach" && auth.role !== "admin") {
@@ -135,7 +133,6 @@ Deno.serve(async (req) => {
       "push failed",
     );
 
-
     return jsonResponse({ ok: true, sent: results.length, results }, 200, req);
   } catch (e) {
     // M6 (audit 2026-06-03): non propagare al chiamante il messaggio interno
@@ -146,4 +143,3 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: "Errore invio notifica push." }, 500, req);
   }
 });
-

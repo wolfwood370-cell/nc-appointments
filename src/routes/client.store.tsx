@@ -11,6 +11,19 @@ import { OwnedBoosterCard } from "@/components/owned-booster-card";
 import { useClientExtraCredits } from "@/lib/queries";
 
 export const Route = createFileRoute("/client/store")({
+  head: () => ({
+    meta: [
+      { title: "Acquista pacchetti | NC Training Systems" },
+      { name: "description", content: "Acquista percorsi mensili, PT Pack e sessioni singole." },
+      { property: "og:title", content: "Acquista pacchetti | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Acquista percorsi mensili, PT Pack e sessioni singole.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: StorePage,
 });
 

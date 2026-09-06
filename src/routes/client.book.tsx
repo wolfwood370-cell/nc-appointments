@@ -11,8 +11,6 @@ import {
   useCoachAvailabilityExceptions,
   useCoachEventTypes,
   useCoachOptimizationEnabled,
-  type AvailabilityRow,
-  type AvailabilityExceptionRow,
   type EventTypeRow,
 } from "@/lib/queries";
 // generateMockMeetLink was deprecated: the real Google Meet URL is now
@@ -25,7 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format, startOfMonth, addDays, startOfDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { EmptyStateCard } from "@/components/empty-state-card";
-import { generateSlots, type Slot, type BlockedRange } from "@/lib/booking-slots";
+import { generateSlots, type BlockedRange } from "@/lib/booking-slots";
 import { BookCalendarGrid } from "@/components/book-calendar-grid";
 import { BookSlotsGrid } from "@/components/book-slots-grid";
 import { BookPoolPicker } from "@/components/book-pool-picker";
@@ -42,6 +40,22 @@ import { useBookConfirm } from "@/hooks/use-book-confirm";
 // evitare che valori arbitrari entrino in query/lookup downstream.
 const BOOK_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const Route = createFileRoute("/client/book")({
+  head: () => ({
+    meta: [
+      { title: "Prenota una sessione | NC Training Systems" },
+      {
+        name: "description",
+        content: "Scegli data, orario e tipologia per prenotare la tua prossima sessione.",
+      },
+      { property: "og:title", content: "Prenota una sessione | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Scegli data, orario e tipologia per prenotare la tua prossima sessione.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: BookFlow,
   validateSearch: (search: Record<string, unknown>): { eventType?: string } => {
     const v = search.eventType;
@@ -147,7 +161,7 @@ function BookFlow() {
   // Lette qui per allineare gli slot mostrati al cliente con il trigger
   // server-side `enforce_client_booking_rules`. Default 24h / 60gg se manca
   // la riga trainer_settings.
-  const trainerSettingsQ = useQuery({
+  const _trainerSettingsQ = useQuery({
     queryKey: ["coach-booking-rules", coachIdForAvail],
     enabled: !!coachIdForAvail,
     queryFn: async () => {
@@ -264,16 +278,6 @@ function BookFlow() {
     minNoticeHours,
     horizonDays,
   ]);
-
-  const grouped = useMemo(() => {
-    const m = new Map<string, Slot[]>();
-    for (const s of slots) {
-      const k = s.date.toDateString();
-      if (!m.has(k)) m.set(k, []);
-      m.get(k)!.push(s);
-    }
-    return m;
-  }, [slots]);
 
   // Pools list (one entry per credit pool: block allocation OR extra credit pack).
   interface Pool {

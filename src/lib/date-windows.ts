@@ -47,4 +47,3 @@ export function startOfYear(): Date {
   const d = new Date();
   return new Date(d.getFullYear(), 0, 1);
 }
-

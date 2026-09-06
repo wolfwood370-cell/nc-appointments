@@ -146,75 +146,87 @@ type GcalCreateInput = {
 export const gcalCreateEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input): GcalCreateInput => input as GcalCreateInput)
-  .handler(async ({ data: rawInput, context }): Promise<GcalResult<{ googleEventId: string; meetingLink: string | null; htmlLink: string | null }>> => {
-    // bookingId estratto in modo tollerante PRIMA della validazione Zod, cosi'
-    // anche un payload che fallisce la parse puo' comunque registrare l'errore
-    // sul booking giusto (vedi catch).
-    const rawObj = (rawInput ?? {}) as Record<string, unknown>;
-    let bookingId: string | undefined =
-      typeof rawObj.bookingId === "string" ? (rawObj.bookingId as string) : undefined;
+  .handler(
+    async ({
+      data: rawInput,
+      context,
+    }): Promise<
+      GcalResult<{ googleEventId: string; meetingLink: string | null; htmlLink: string | null }>
+    > => {
+      // bookingId estratto in modo tollerante PRIMA della validazione Zod, cosi'
+      // anche un payload che fallisce la parse puo' comunque registrare l'errore
+      // sul booking giusto (vedi catch).
+      const rawObj = (rawInput ?? {}) as Record<string, unknown>;
+      let bookingId: string | undefined =
+        typeof rawObj.bookingId === "string" ? (rawObj.bookingId as string) : undefined;
 
-    let step = "entry";
-    try {
-      // La validazione Zod sta DENTRO il try (non nell'inputValidator chain):
-      // in TanStack Start un throw nell'inputValidator produce una response 200
-      // con envelope TSR/Error PRIMA del handler -> l'errore non sarebbe mai
-      // registrato. Qui invece un fail diventa last_gcal_error="[step:zod] ..."
-      // visibile via SQL. (Lezione del bug colorId, 2026-06-06.)
-      step = "zod";
-      const data = CreateSchema.parse(rawInput);
-      bookingId = data.bookingId;
+      let step = "entry";
+      try {
+        // La validazione Zod sta DENTRO il try (non nell'inputValidator chain):
+        // in TanStack Start un throw nell'inputValidator produce una response 200
+        // con envelope TSR/Error PRIMA del handler -> l'errore non sarebbe mai
+        // registrato. Qui invece un fail diventa last_gcal_error="[step:zod] ..."
+        // visibile via SQL. (Lezione del bug colorId, 2026-06-06.)
+        step = "zod";
+        const data = CreateSchema.parse(rawInput);
+        bookingId = data.bookingId;
 
-      step = "assertBookingAccess";
-      // S-AUTHZ: ownership SEMPRE applicato (bookingId ora obbligatorio).
-      const { attendeeEmail } = await assertBookingAccessAndGetAttendee(
-        data.bookingId,
-        context.userId,
-      );
+        step = "assertBookingAccess";
+        // S-AUTHZ: ownership SEMPRE applicato (bookingId ora obbligatorio).
+        const { attendeeEmail } = await assertBookingAccessAndGetAttendee(
+          data.bookingId,
+          context.userId,
+        );
 
-      step = "gcalCreate";
-      const r = await gcalCreate({
-        summary: data.summary,
-        description: data.description,
-        startISO: data.startISO,
-        endISO: data.endISO,
-        // Email autoritativa derivata dal booking, mai dal client.
-        attendeeEmail: attendeeEmail ?? undefined,
-        requestMeet: data.requestMeet,
-        isOnline: data.isOnline,
-        colorId: data.colorId,
-      });
+        step = "gcalCreate";
+        const r = await gcalCreate({
+          summary: data.summary,
+          description: data.description,
+          startISO: data.startISO,
+          endISO: data.endISO,
+          // Email autoritativa derivata dal booking, mai dal client.
+          attendeeEmail: attendeeEmail ?? undefined,
+          requestMeet: data.requestMeet,
+          isOnline: data.isOnline,
+          colorId: data.colorId,
+        });
 
-      step = "writeback";
-      if (r.googleEventId) {
-        const { error: upErr } = await supabaseAdmin
-          .from("bookings")
-          .update({
-            google_event_id: r.googleEventId,
-            ...(r.meetingLink ? { meeting_link: r.meetingLink } : {}),
-          })
-          .eq("id", data.bookingId);
-        if (upErr) {
-          console.error("gcalCreateEvent: booking writeback failed", upErr);
+        step = "writeback";
+        if (r.googleEventId) {
+          const { error: upErr } = await supabaseAdmin
+            .from("bookings")
+            .update({
+              google_event_id: r.googleEventId,
+              ...(r.meetingLink ? { meeting_link: r.meetingLink } : {}),
+            })
+            .eq("id", data.bookingId);
+          if (upErr) {
+            console.error("gcalCreateEvent: booking writeback failed", upErr);
+          }
         }
-      }
 
-      // Successo: azzeriamo last_gcal_error (nessun errore in sospeso).
-      await persistGcalError(data.bookingId, null);
+        // Successo: azzeriamo last_gcal_error (nessun errore in sospeso).
+        await persistGcalError(data.bookingId, null);
 
-      return { ok: true, googleEventId: r.googleEventId, meetingLink: r.meetingLink, htmlLink: r.htmlLink };
-    } catch (e) {
-      console.error("gcalCreateEvent failed", e);
-      const errBody = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
-      // last_gcal_error registra DOVE e' fallito (step) + il messaggio raw,
-      // cosi' la diagnostica futura non richiede ri-strumentare il codice.
-      const rawMsg = `[step:${step}] ${errBody}`;
-      if (bookingId) {
-        await persistGcalError(bookingId, rawMsg.slice(0, 1000));
+        return {
+          ok: true,
+          googleEventId: r.googleEventId,
+          meetingLink: r.meetingLink,
+          htmlLink: r.htmlLink,
+        };
+      } catch (e) {
+        console.error("gcalCreateEvent failed", e);
+        const errBody = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+        // last_gcal_error registra DOVE e' fallito (step) + il messaggio raw,
+        // cosi' la diagnostica futura non richiede ri-strumentare il codice.
+        const rawMsg = `[step:${step}] ${errBody}`;
+        if (bookingId) {
+          await persistGcalError(bookingId, rawMsg.slice(0, 1000));
+        }
+        return { ok: false, error: scrubGcalError(e, "create") };
       }
-      return { ok: false, error: scrubGcalError(e, "create") };
-    }
-  });
+    },
+  );
 
 // GCAL-DIAG (2026-06-06): writeback del raw error su bookings.last_gcal_error.
 // Wrapped in try/catch perché:
@@ -349,7 +361,10 @@ type ReconcileResult = {
 
 export const gcalReconcileEvents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input): { timeMinISO?: string; timeMaxISO?: string } => (input ?? {}) as { timeMinISO?: string; timeMaxISO?: string })
+  .inputValidator(
+    (input): { timeMinISO?: string; timeMaxISO?: string } =>
+      (input ?? {}) as { timeMinISO?: string; timeMaxISO?: string },
+  )
   .handler(async ({ data, context }): Promise<ReconcileResult> => {
     try {
       // Authz: solo coach/admin (operazione su tutte le sessioni del workspace).
@@ -368,8 +383,14 @@ export const gcalReconcileEvents = createServerFn({ method: "POST" })
       // Quando il caller passa timeMinISO/timeMaxISO espliciti -> forza sync
       // su una finestra arbitraria (es. dal 1° gennaio per allineare tutto
       // lo storico Google -> DB).
-      const timeMinISO = typeof data.timeMinISO === "string" ? data.timeMinISO : new Date(now - 60 * 60_000).toISOString();
-      const timeMaxISO = typeof data.timeMaxISO === "string" ? data.timeMaxISO : new Date(now + 16 * 24 * 60 * 60_000).toISOString();
+      const timeMinISO =
+        typeof data.timeMinISO === "string"
+          ? data.timeMinISO
+          : new Date(now - 60 * 60_000).toISOString();
+      const timeMaxISO =
+        typeof data.timeMaxISO === "string"
+          ? data.timeMaxISO
+          : new Date(now + 16 * 24 * 60 * 60_000).toISOString();
 
       // Sessioni candidate: scheduled, non cancellate, con evento Google, nella finestra.
       const { data: bookings, error: bErr } = await supabaseAdmin
@@ -386,7 +407,6 @@ export const gcalReconcileEvents = createServerFn({ method: "POST" })
       }
       const rows = bookings ?? [];
       if (rows.length === 0) return { ok: true, cancelled: 0, moved: 0, conflicts: 0 };
-
 
       const byEventId = new Map<string, { id: string; scheduledMs: number }>();
       for (const b of rows) {
@@ -544,10 +564,21 @@ export const gcalRepairMissingEvents = createServerFn({ method: "POST" })
       if (bookings.length === 0) return { ok: true, created: 0, failed: 0, total: 0 };
 
       // Prefetch event_types + profiles in 2 query (no N+1).
-      const eventTypeIds = [...new Set(bookings.map((b) => b.event_type_id).filter(Boolean) as string[])];
+      const eventTypeIds = [
+        ...new Set(bookings.map((b) => b.event_type_id).filter(Boolean) as string[]),
+      ];
       const clientIds = [...new Set(bookings.map((b) => b.client_id).filter(Boolean) as string[])];
 
-      const eventTypeMap = new Map<string, { name: string; color: string; location_type: string; duration: number; description: string | null }>();
+      const eventTypeMap = new Map<
+        string,
+        {
+          name: string;
+          color: string;
+          location_type: string;
+          duration: number;
+          description: string | null;
+        }
+      >();
       if (eventTypeIds.length > 0) {
         const { data: ets } = await supabaseAdmin
           .from("event_types")
@@ -595,7 +626,9 @@ export const gcalRepairMissingEvents = createServerFn({ method: "POST" })
           const startISO = new Date(b.scheduled_at).toISOString();
           const endISO = b.end_at
             ? new Date(b.end_at).toISOString()
-            : new Date(new Date(b.scheduled_at).getTime() + (b.duration_min ?? 60) * 60_000).toISOString();
+            : new Date(
+                new Date(b.scheduled_at).getTime() + (b.duration_min ?? 60) * 60_000,
+              ).toISOString();
 
           const isOnline = et?.location_type === "online";
           // Attendee SOLO per sessioni con un vero cliente (non blocchi
@@ -633,7 +666,8 @@ export const gcalRepairMissingEvents = createServerFn({ method: "POST" })
             failed++;
           }
         } catch (perBookingErr) {
-          const msg = perBookingErr instanceof Error ? perBookingErr.message : String(perBookingErr);
+          const msg =
+            perBookingErr instanceof Error ? perBookingErr.message : String(perBookingErr);
           console.error("gcalRepair: per-booking failed", { id: b.id, msg });
           await persistGcalError(b.id, `[repair] ${msg}`.slice(0, 1000));
           failed++;
@@ -658,14 +692,21 @@ export const gcalRepairMissingEvents = createServerFn({ method: "POST" })
 //   - booking in piattaforma MA non su Google (da rivedere).
 // Nessuna scrittura sul DB, nessuna migration: e' un confronto a video.
 // ----------------------------------------------------------------------------
-type ReviewEvent = { id: string; summary: string; startMs: number | null; endMs: number | null; allDay: boolean };
-type ListReviewResult =
-  | { ok: true; events: ReviewEvent[] }
-  | { ok: false; error: string };
+type ReviewEvent = {
+  id: string;
+  summary: string;
+  startMs: number | null;
+  endMs: number | null;
+  allDay: boolean;
+};
+type ListReviewResult = { ok: true; events: ReviewEvent[] } | { ok: false; error: string };
 
 export const gcalListEventsForReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input): { timeMinISO?: string; timeMaxISO?: string } => (input ?? {}) as { timeMinISO?: string; timeMaxISO?: string })
+  .inputValidator(
+    (input): { timeMinISO?: string; timeMaxISO?: string } =>
+      (input ?? {}) as { timeMinISO?: string; timeMaxISO?: string },
+  )
   .handler(async ({ data, context }): Promise<ListReviewResult> => {
     try {
       // Authz: solo coach/admin (lettura del calendario condiviso del workspace).
@@ -693,7 +734,13 @@ export const gcalListEventsForReview = createServerFn({ method: "POST" })
       // Google->DB) e gli all-day (non mappano a una sessione 1:1).
       const out: ReviewEvent[] = events
         .filter((e) => e.status !== "cancelled" && !e.allDay)
-        .map((e) => ({ id: e.id, summary: e.summary, startMs: e.startMs, endMs: e.endMs, allDay: e.allDay }));
+        .map((e) => ({
+          id: e.id,
+          summary: e.summary,
+          startMs: e.startMs,
+          endMs: e.endMs,
+          allDay: e.allDay,
+        }));
       return { ok: true, events: out };
     } catch (e) {
       console.error("gcalListEventsForReview failed", e);
@@ -817,7 +864,11 @@ export const gcalImportEvent = createServerFn({ method: "POST" })
       // Mappa modalita' -> is_personal + category (CHECK: client_session|personal|consulenza).
       const isPersonalBlock = data.mode === "personal";
       const importCategory =
-        data.mode === "client" ? "client_session" : data.mode === "consulenza" ? "consulenza" : "personal";
+        data.mode === "client"
+          ? "client_session"
+          : data.mode === "consulenza"
+            ? "consulenza"
+            : "personal";
 
       // WORKAROUND TRIGGER CREDITI (2026-06-06): sul DB live il trigger
       // validate_booking_extra_credits NON ha (ancora) la guardia

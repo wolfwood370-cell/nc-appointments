@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -11,25 +11,38 @@ import { CalendarContextPanel } from "@/components/calendar-context-panel";
 import { CalendarGcalReview } from "@/components/calendar-gcal-review";
 import { CalendarEventEditDialog } from "@/components/calendar-event-edit-dialog";
 import { layoutDay } from "@/lib/calendar-layout";
-import { MessageCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCoachBookings,
   useCoachClients,
   useCoachEventTypes,
   type BookingRow,
-  type ProfileRow,
-  type EventTypeRow,
 } from "@/lib/queries";
 import { queryKeys } from "@/lib/query-keys";
 import { gcalReconcileEvents, gcalRepairMissingEvents } from "@/lib/gcal.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { isAllDayEvent, sameDay, MobileAgendaView } from "@/components/mobile-calendar-agenda";
 
 export const Route = createFileRoute("/trainer/calendar")({
+  head: () => ({
+    meta: [
+      { title: "Calendario | NC Training Systems" },
+      {
+        name: "description",
+        content:
+          "Tutti gli appuntamenti, i blocchi personali e la sincronizzazione con Google Calendar.",
+      },
+      { property: "og:title", content: "Calendario | NC Training Systems" },
+      {
+        property: "og:description",
+        content:
+          "Tutti gli appuntamenti, i blocchi personali e la sincronizzazione con Google Calendar.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: CalendarPage,
 });
 
@@ -127,7 +140,6 @@ function CalendarPage() {
       // Repair (DB -> Google) gira a passate da 50 finché non resta nulla.
       let totalCreated = 0;
       let safety = 20;
-      // eslint-disable-next-line no-constant-condition
       while (safety-- > 0) {
         const r = await gcalRepairMissingEvents();
         if (!r.ok) break;

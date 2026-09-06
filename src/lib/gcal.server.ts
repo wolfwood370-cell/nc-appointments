@@ -21,7 +21,7 @@ const CALENDAR_PATH = "/calendar/v3/calendars/primary/events";
 // echoare i nostri headers, ma se per qualche motivo lo facesse, non vogliamo
 // un token nei log persistenti. La sostituzione è non-greedy + case-insensitive.
 function redactBearer(s: string): string {
-  return s.replace(/Bearer\s+[A-Za-z0-9._\-]+/gi, "Bearer [REDACTED]");
+  return s.replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer [REDACTED]");
 }
 
 function requireEnv(name: string): string {

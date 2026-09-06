@@ -57,7 +57,10 @@ function esc(value: string | null | undefined): string {
 }
 
 function safeSubject(s: string): string {
-  return String(s).replace(/[\r\n\t]/g, " ").trim().slice(0, 200);
+  return String(s)
+    .replace(/[\r\n\t]/g, " ")
+    .trim()
+    .slice(0, 200);
 }
 
 function safeOrigin(o: string | undefined): string {
@@ -110,7 +113,10 @@ function renderInvitation(p: InvitationParams): { subject: string; html: string 
   };
 }
 
-function renderBookingConfirmation(p: BookingConfirmationParams): { subject: string; html: string } {
+function renderBookingConfirmation(p: BookingConfirmationParams): {
+  subject: string;
+  html: string;
+} {
   const when = new Date(p.scheduledAtISO).toLocaleString("it-IT", {
     weekday: "long",
     day: "numeric",
@@ -141,8 +147,7 @@ function renderBookingConfirmation(p: BookingConfirmationParams): { subject: str
 function validateParams(template: TemplateId, params: unknown): string | null {
   if (!params || typeof params !== "object") return "params mancanti";
   const p = params as Record<string, unknown>;
-  const isStr = (v: unknown, max = 200) =>
-    typeof v === "string" && v.length > 0 && v.length <= max;
+  const isStr = (v: unknown, max = 200) => typeof v === "string" && v.length > 0 && v.length <= max;
   if (template === "invitation") {
     if (!isStr(p.coachName, 200)) return "coachName richiesto (max 200)";
     if (p.clientName != null && (typeof p.clientName !== "string" || p.clientName.length > 200))
@@ -156,7 +161,10 @@ function validateParams(template: TemplateId, params: unknown): string | null {
     if (!isStr(p.scheduledAtISO, 64)) return "scheduledAtISO richiesto";
     const d = new Date(p.scheduledAtISO as string);
     if (isNaN(d.getTime())) return "scheduledAtISO non valido";
-    if (p.recipientName != null && (typeof p.recipientName !== "string" || p.recipientName.length > 200))
+    if (
+      p.recipientName != null &&
+      (typeof p.recipientName !== "string" || p.recipientName.length > 200)
+    )
       return "recipientName troppo lungo";
     return null;
   }
@@ -268,11 +276,7 @@ Deno.serve(async (req) => {
         body: text.slice(0, 500),
       });
       // Scrubbing: non esponiamo dettagli upstream al chiamante.
-      return jsonResponse(
-        { error: "Invio email fallito. Riprova più tardi." },
-        502,
-        req,
-      );
+      return jsonResponse({ error: "Invio email fallito. Riprova più tardi." }, 502, req);
     }
 
     // Wave 7 P7: non esporre il message id Resend (info leak).

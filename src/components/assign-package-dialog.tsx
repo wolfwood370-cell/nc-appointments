@@ -28,12 +28,7 @@ import { Sparkles, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 import type { SessionType } from "@/lib/mock-data";
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -248,7 +243,7 @@ export function AssignPackageDialog({
         <DialogTitle>Assegna pacchetto — {clientName}</DialogTitle>
       </DialogHeader>
 
-      {(
+      {
         <div className="space-y-4">
           {hasExistingPackage && (
             <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 flex gap-3 text-xs text-amber-900">
@@ -346,8 +341,8 @@ export function AssignPackageDialog({
               <div>
                 <h3 className="font-semibold text-sm">Crediti da assegnare</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Verranno accreditati come crediti extra (validità 1 anno). Il cliente li usa quando
-                  vuole, senza percorso a settimane.
+                  Verranno accreditati come crediti extra (validità 1 anno). Il cliente li usa
+                  quando vuole, senza percorso a settimane.
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -425,11 +420,7 @@ export function AssignPackageDialog({
           {pathType !== "free" && (
             <div className="space-y-2">
               <Label>Data di inizio primo blocco</Label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
           )}
 
@@ -536,10 +527,14 @@ export function AssignPackageDialog({
             </div>
           )}
         </div>
-      )}
+      }
 
       <DialogFooter>
-        <Button type="button" onClick={handleSubmit} disabled={submitting || eventTypes.length === 0}>
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={submitting || eventTypes.length === 0}
+        >
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
           Assegna pacchetto
         </Button>

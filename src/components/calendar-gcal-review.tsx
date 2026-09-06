@@ -185,9 +185,7 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
         toast.error("Import non riuscito", { description: r.error });
         return;
       }
-      toast.success(
-        r.alreadyImported ? "Evento già presente in piattaforma" : "Evento importato",
-      );
+      toast.success(r.alreadyImported ? "Evento già presente in piattaforma" : "Evento importato");
       setImportTarget(null);
       // Aggiorna calendario + pannello.
       qc.invalidateQueries({ queryKey: queryKeys.bookings.coach(coachId) });
@@ -269,8 +267,8 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                 Su Google, non in piattaforma ({googleOnly.length})
               </h4>
               <p className="text-xs text-muted-foreground mb-2">
-                Eventi creati direttamente su Google Calendar. Premi "Importa" per
-                aggiungerli all'app NC Calendar.
+                Eventi creati direttamente su Google Calendar. Premi "Importa" per aggiungerli
+                all'app NC Calendar.
               </p>
               <ul className="space-y-1">
                 {googleOnly.map((e) => (
@@ -280,7 +278,9 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                   >
                     <span className="truncate">{e.summary || "(senza titolo)"}</span>
                     <span className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs text-muted-foreground">{fmtDateTime(e.startMs)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {fmtDateTime(e.startMs)}
+                      </span>
                       <Button size="sm" variant="outline" onClick={() => openImport(e)}>
                         Importa
                       </Button>
@@ -299,9 +299,8 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                 In piattaforma, non su Google ({platformOnly.length})
               </h4>
               <p className="text-xs text-muted-foreground mb-2">
-                Sessioni prenotate nell'app senza un evento Google corrispondente.
-                Da rivedere (potrebbero essere state cancellate su Google, o non
-                ancora sincronizzate).
+                Sessioni prenotate nell'app senza un evento Google corrispondente. Da rivedere
+                (potrebbero essere state cancellate su Google, o non ancora sincronizzate).
               </p>
               <ul className="space-y-1">
                 {platformOnly.map((b) => (
@@ -327,7 +326,8 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
           <DialogHeader>
             <DialogTitle>Importa evento da Google</DialogTitle>
             <DialogDescription>
-              {importTarget?.summary || "(senza titolo)"} · {fmtDateTime(importTarget?.startMs ?? null)}
+              {importTarget?.summary || "(senza titolo)"} ·{" "}
+              {fmtDateTime(importTarget?.startMs ?? null)}
             </DialogDescription>
           </DialogHeader>
 
@@ -339,8 +339,8 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                   <span className="font-medium">Sessione di un cliente</span>
                   <br />
                   <span className="text-xs text-muted-foreground">
-                    Collegata a un cliente per lo storico. NON scala crediti
-                    (gestiscili a parte se serve).
+                    Collegata a un cliente per lo storico. NON scala crediti (gestiscili a parte se
+                    serve).
                   </span>
                 </Label>
               </div>
@@ -350,8 +350,8 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                   <span className="font-medium">Consulenza / appuntamento esterno</span>
                   <br />
                   <span className="text-xs text-muted-foreground">
-                    Per chi non è un cliente registrato (consulenze, prima
-                    chiamata, impegni esterni). Occupa lo slot, nessun credito.
+                    Per chi non è un cliente registrato (consulenze, prima chiamata, impegni
+                    esterni). Occupa lo slot, nessun credito.
                   </span>
                 </Label>
               </div>
@@ -361,8 +361,7 @@ export function CalendarGcalReview({ coachId, bookings, clientsMap, eventTypesMa
                   <span className="font-medium">Impegno personale / blocco</span>
                   <br />
                   <span className="text-xs text-muted-foreground">
-                    Tempo personale (palestra, pausa, ecc.). Non collegato a
-                    nessuno.
+                    Tempo personale (palestra, pausa, ecc.). Non collegato a nessuno.
                   </span>
                 </Label>
               </div>

@@ -19,10 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -36,6 +33,22 @@ import { AdminStatCard } from "@/components/admin-stat-card";
 import { AdminRoleEditor } from "@/components/admin-role-editor";
 
 export const Route = createFileRoute("/admin")({
+  head: () => ({
+    meta: [
+      { title: "Amministrazione | NC Training Systems" },
+      {
+        name: "description",
+        content: "Pannello di amministrazione: utenti, ruoli e impostazioni della piattaforma.",
+      },
+      { property: "og:title", content: "Amministrazione | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Pannello di amministrazione: utenti, ruoli e impostazioni della piattaforma.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   // M2 (FULL_APP_AUDIT.md): server-side route guard. The previous
   // role check happened in the React tree after useAuth resolved,
   // letting non-admins briefly mount the admin page (queries fire,
@@ -148,7 +161,7 @@ function AdminPage() {
             <div className="size-8 rounded-full bg-primary text-primary-foreground grid place-items-center">
               <Dumbbell className="size-4" />
             </div>
-            <span className="font-display font-semibold">Stride</span>
+            <span className="font-display font-semibold">NC Training Systems</span>
             <Badge variant="secondary" className="ml-2">
               <Shield className="size-3 mr-1" /> Admin
             </Badge>
@@ -271,4 +284,3 @@ function AdminPage() {
     </div>
   );
 }
-

@@ -73,9 +73,7 @@ export function CalendarEventEditDialog({
     mutationFn: async () => {
       if (!booking) return;
       const isoStart = new Date(scheduledAt).toISOString();
-      const endAt = new Date(
-        new Date(scheduledAt).getTime() + durationMin * 60000,
-      ).toISOString();
+      const endAt = new Date(new Date(scheduledAt).getTime() + durationMin * 60000).toISOString();
       const { error } = await supabase
         .from("bookings")
         .update({

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import {
@@ -10,7 +10,7 @@ import {
   useCoachEventTypes,
 } from "@/lib/queries";
 import { queryKeys } from "@/lib/query-keys";
-import { sessionLabel, type SessionType } from "@/lib/mock-data";
+import { sessionLabel } from "@/lib/mock-data";
 import { initials } from "@/lib/initials";
 import { startOfToday, endOfToday, startOfYear } from "@/lib/date-windows";
 import { iconForType } from "@/lib/session-type-icon";
@@ -35,6 +35,22 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/trainer/")({
+  head: () => ({
+    meta: [
+      { title: "Panoramica coach | NC Training Systems" },
+      {
+        name: "description",
+        content: "Appuntamenti di oggi, clienti attivi e attività recenti in un'unica schermata.",
+      },
+      { property: "og:title", content: "Panoramica coach | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Appuntamenti di oggi, clienti attivi e attività recenti in un'unica schermata.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Overview,
 });
 

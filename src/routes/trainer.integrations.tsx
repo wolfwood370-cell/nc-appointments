@@ -3,6 +3,22 @@ import { IntegrationCard } from "@/components/integration-card";
 import { Calendar, CreditCard, Video, Check } from "lucide-react";
 
 export const Route = createFileRoute("/trainer/integrations")({
+  head: () => ({
+    meta: [
+      { title: "Integrazioni | NC Training Systems" },
+      {
+        name: "description",
+        content: "Collega Google Calendar e gestisci la sincronizzazione degli appuntamenti.",
+      },
+      { property: "og:title", content: "Integrazioni | NC Training Systems" },
+      {
+        property: "og:description",
+        content: "Collega Google Calendar e gestisci la sincronizzazione degli appuntamenti.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: IntegrationsPage,
 });
 
