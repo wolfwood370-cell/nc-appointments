@@ -837,13 +837,6 @@ function ClientPathPage() {
   // ricontrolliamo anche qui server-side-ish prima di scrivere.
   async function assignPackage(data: AssignPackagePayload) {
     if (!user) return;
-    if (blocks.length > 0) {
-      toast.error("Il cliente ha già un percorso a blocchi attivo", {
-        description:
-          "Ricarica la pagina: un nuovo percorso è assegnabile solo a clienti senza blocchi attivi.",
-      });
-      return;
-    }
     setAssigning(true);
     try {
       if (data.pathType === "free") {
