@@ -161,7 +161,7 @@ function AdminPage() {
             <div className="size-8 rounded-full bg-primary text-primary-foreground grid place-items-center">
               <Dumbbell className="size-4" />
             </div>
-            <span className="font-display font-semibold">Stride</span>
+            <span className="font-display font-semibold">NC Training Systems</span>
             <Badge variant="secondary" className="ml-2">
               <Shield className="size-3 mr-1" /> Admin
             </Badge>
