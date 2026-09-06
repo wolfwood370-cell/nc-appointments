@@ -58,6 +58,8 @@ export interface AssignPackagePayload {
   totalBlocks: number;
   packLabel: string | null;
   autoRenew: boolean;
+  /** Data di inizio del primo nuovo blocco (YYYY-MM-DD). */
+  startDate: string;
   rules: Array<{
     eventTypeId: string;
     sessionType: SessionType;
@@ -89,14 +91,16 @@ export function AssignPackageDialog({
   eventTypes,
   hasExistingPackage,
   hasCredits = false,
+  defaultStartDate,
   onAssign,
 }: {
   open: boolean;
   clientName: string;
   eventTypes: AssignPackageEventType[];
-  /** true se il cliente ha già blocchi attivi o crediti extra: in v1 blocchiamo
-   *  la riassegnazione per non sovrascrivere/duplicare dati. */
+  /** true se il cliente ha già blocchi: i nuovi blocchi vengono accodati. */
   hasExistingPackage: boolean;
+  /** Data suggerita per il primo nuovo blocco (YYYY-MM-DD). */
+  defaultStartDate?: string;
   /** true se esistono già crediti extra: non blocca, mostra solo un avviso. */
   hasCredits?: boolean;
   onAssign: (d: AssignPackagePayload) => Promise<void>;
@@ -109,6 +113,8 @@ export function AssignPackageDialog({
   const [freeSessions, setFreeSessions] = useState<number>(1);
   const [freeEventTypeId, setFreeEventTypeId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const [startDate, setStartDate] = useState<string>(defaultStartDate ?? todayIso);
 
   // Reset lo stato quando il dialog si chiude (il subtree resta montato).
   const wasOpenRef = useRef(false);
@@ -124,12 +130,15 @@ export function AssignPackageDialog({
       setSubmitting(false);
     }
     // Quando si apre: default freeEventTypeId al primo PT disponibile.
-    if (!wasOpenRef.current && open && !freeEventTypeId) {
-      const pt = eventTypes.find((e) => e.base_type === "PT Session") ?? eventTypes[0];
-      if (pt) setFreeEventTypeId(pt.id);
+    if (!wasOpenRef.current && open) {
+      setStartDate(defaultStartDate ?? new Date().toISOString().slice(0, 10));
+      if (!freeEventTypeId) {
+        const pt = eventTypes.find((e) => e.base_type === "PT Session") ?? eventTypes[0];
+        if (pt) setFreeEventTypeId(pt.id);
+      }
     }
     wasOpenRef.current = open;
-  }, [open, eventTypes, freeEventTypeId]);
+  }, [open, eventTypes, freeEventTypeId, defaultStartDate]);
 
   const totalBlocks =
     pathType === "recurring"
@@ -223,6 +232,7 @@ export function AssignPackageDialog({
         totalBlocks: pathType === "free" ? 0 : totalBlocks,
         packLabel: pathType === "free" ? (packLabel ?? "Cliente Libero") : packLabel,
         autoRenew: pathType === "recurring",
+        startDate,
         rules: expandedRules,
         freeSessions: pathType === "free" ? freeSessions : undefined,
         freeEventTypeId: pathType === "free" ? freeEventTypeId : undefined,
@@ -238,20 +248,17 @@ export function AssignPackageDialog({
         <DialogTitle>Assegna pacchetto — {clientName}</DialogTitle>
       </DialogHeader>
 
-      {hasExistingPackage ? (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 flex gap-3">
-          <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
-            <p className="font-semibold">Questo cliente ha già un percorso a blocchi attivo.</p>
-            <p className="mt-1">
-              Per evitare di sovrascrivere o duplicare dati, l'assegnazione di un nuovo percorso è
-              disponibile solo per clienti senza blocchi attivi. La funzione "cambia pacchetto" (con
-              azzeramento del precedente) verrà aggiunta più avanti.
-            </p>
-          </div>
-        </div>
-      ) : (
+      {(
         <div className="space-y-4">
+          {hasExistingPackage && (
+            <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 flex gap-3 text-xs text-amber-900">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                Questo cliente ha già dei blocchi: i nuovi blocchi vengono <strong>accodati</strong>{" "}
+                a partire dalla data d'inizio indicata, senza cancellare quelli esistenti.
+              </span>
+            </div>
+          )}
           {hasCredits && (
             <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
               Questo cliente ha già dei crediti extra: la nuova assegnazione li{" "}
@@ -404,16 +411,26 @@ export function AssignPackageDialog({
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                {totalBlocks} blocchi sequenziali (~30 giorni ciascuno). La data d'inizio sarà oggi
-                (modificabile poi dalla scheda).
+                {totalBlocks} blocchi sequenziali da 4 settimane (28 giorni) ciascuno.
               </p>
             </div>
           )}
 
           {pathType === "recurring" && (
             <p className="text-xs text-muted-foreground">
-              1 blocco mensile con rinnovo automatico ogni 30 giorni. Data d'inizio: oggi.
+              1 blocco da 4 settimane con rinnovo automatico.
             </p>
+          )}
+
+          {pathType !== "free" && (
+            <div className="space-y-2">
+              <Label>Data di inizio primo blocco</Label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
           )}
 
           {/* Regole crediti per Percorso/Abbonamento */}
@@ -522,16 +539,10 @@ export function AssignPackageDialog({
       )}
 
       <DialogFooter>
-        {!hasExistingPackage && (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting || eventTypes.length === 0}
-          >
-            {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
-            Assegna pacchetto
-          </Button>
-        )}
+        <Button type="button" onClick={handleSubmit} disabled={submitting || eventTypes.length === 0}>
+          {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
+          Assegna pacchetto
+        </Button>
       </DialogFooter>
     </DialogContent>
   );

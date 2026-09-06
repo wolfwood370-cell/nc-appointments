@@ -837,13 +837,6 @@ function ClientPathPage() {
   // ricontrolliamo anche qui server-side-ish prima di scrivere.
   async function assignPackage(data: AssignPackagePayload) {
     if (!user) return;
-    if (blocks.length > 0) {
-      toast.error("Il cliente ha già un percorso a blocchi attivo", {
-        description:
-          "Ricarica la pagina: un nuovo percorso è assegnabile solo a clienti senza blocchi attivi.",
-      });
-      return;
-    }
     setAssigning(true);
     try {
       if (data.pathType === "free") {
@@ -873,20 +866,34 @@ function ClientPathPage() {
           .eq("id", clientId);
         if (pErr) throw pErr;
       } else {
-        // Percorso Fisso / Abbonamento: blocchi + allocations a partire da oggi.
-        const today = new Date();
+        // Percorso Fisso / Abbonamento: blocchi da 4 settimane, ACCODATI a quelli
+        // esistenti (la catena deve restare contigua: repair_blocks_alignment
+        // ricalcola le date a partire da path_start_date).
+        const { data: existing, error: exErr } = await supabase
+          .from("training_blocks")
+          .select("sequence_order, end_date")
+          .eq("client_id", clientId)
+          .is("deleted_at", null)
+          .order("sequence_order", { ascending: false })
+          .limit(1);
+        if (exErr) throw exErr;
+        const last = existing?.[0];
+        const seqOffset = last ? (last.sequence_order as number) : 0;
+        const firstStart = last
+          ? new Date(new Date(`${last.end_date}T00:00:00Z`).getTime() + 86400000)
+          : new Date(`${data.startDate}T00:00:00Z`);
+        const DAY = 86400000;
         const blocksToInsert = Array.from({ length: data.totalBlocks }, (_, i) => {
-          const start = new Date(today);
-          start.setDate(today.getDate() + i * 30);
-          const end = new Date(today);
-          end.setDate(today.getDate() + (i + 1) * 30 - 1);
+          const start = new Date(firstStart.getTime() + i * 28 * DAY);
+          const end = new Date(start.getTime() + 27 * DAY);
           return {
             client_id: clientId,
             coach_id: user.id,
             start_date: start.toISOString().slice(0, 10),
             end_date: end.toISOString().slice(0, 10),
             status: "active" as const,
-            sequence_order: i + 1,
+            sequence_order: seqOffset + i + 1,
+            duration_days: 28,
           };
         });
         const { data: blocksRes, error: bErr } = await supabase
@@ -913,7 +920,7 @@ function ClientPathPage() {
         }> = [];
         for (const rule of data.rules) {
           for (let m = rule.startBlock; m <= rule.endBlock; m++) {
-            const b = blockBySeq.get(m);
+            const b = blockBySeq.get(seqOffset + m);
             if (!b) continue;
             allocsToInsert.push({
               block_id: b.id,
@@ -931,12 +938,13 @@ function ClientPathPage() {
           if (aErr) throw aErr;
         }
 
-        // path_start_date = oggi (= start del blocco 1). Senza, repair/ensure
-        // ritornano no_anchor e il cron auto-renew salta il cliente.
-        const today2 = new Date();
-        const nextBilling = new Date(today2);
-        nextBilling.setDate(today2.getDate() + 30);
-        const pathStartIso = today2.toISOString().slice(0, 10);
+        // path_start_date = start del blocco 1 della catena. Se il cliente ha
+        // già dei blocchi, l'ancora esistente NON va toccata (repair ricalcola
+        // le date da lì); si imposta solo quando manca.
+        const lastNewEnd = blocksToInsert[blocksToInsert.length - 1]?.end_date ?? null;
+        const pathStartIso = pathStart
+          ? toIso(pathStart)
+          : (blocksToInsert[0]?.start_date ?? null);
         const { error: pErr } = await supabase
           .from("profiles")
           .update({
@@ -945,8 +953,7 @@ function ClientPathPage() {
             auto_renew_blocks: data.autoRenew,
             pack_label: data.packLabel,
             path_start_date: pathStartIso,
-            next_billing_date:
-              data.pathType === "recurring" ? nextBilling.toISOString().slice(0, 10) : null,
+            next_billing_date: data.pathType === "recurring" ? lastNewEnd : null,
           })
           .eq("id", clientId);
         if (pErr) throw pErr;
